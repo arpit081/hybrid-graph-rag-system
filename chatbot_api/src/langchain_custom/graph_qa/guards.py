@@ -29,7 +29,7 @@ except ImportError:
 try:
     import neo4j
     AccessMode = neo4j.AccessMode
-except ImportError:
+except (ImportError, AttributeError):
     class AccessMode:  # type: ignore[no-redef]
         READ = "READ"
         WRITE = "WRITE"

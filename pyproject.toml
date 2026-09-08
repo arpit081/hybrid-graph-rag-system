@@ -9,12 +9,19 @@ package-mode = false
 [tool.poetry.dependencies]
 python = "^3.12"
 pre-commit = "^3.7.1"
+langchain = "^0.2.10"
 langchain-community = "^0.2.9"
 langchain-openai = "^0.1.17"
 streamlit = "^1.36.0"
 pytest = "^8.3.1"
 neo4j = "^5.22.0"
 rptree = "^0.1.1"
+fastapi = "^0.109.0"
+httpx = ">=0.23.0"
+uvicorn = "^0.25.0"
+redis = ">=5.0.0"
+pydantic-settings = ">=2.0.0"
+langgraph = ">=0.2.0"
 
 
 [build-system]
