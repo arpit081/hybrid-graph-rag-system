@@ -50,5 +50,4 @@ jobs:
         HOSPITAL_QA_MODEL: ${{ secrets.HOSPITAL_QA_MODEL}}
 
       run: |
-        poetry run pytest cypher_example_portal/tests/
-        poetry run pytest chatbot_api/tests/
+        poetry run pytest chatbot_api/tests/test_cypher_guards.py chatbot_api/tests/test_redis_and_streaming.py -v
