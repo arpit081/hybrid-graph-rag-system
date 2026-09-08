@@ -53,7 +53,7 @@ def get_llm(
 
     from langchain_openai import ChatOpenAI
 
-    chosen_model = model or settings.HOSPITAL_AGENT_MODEL
+    chosen_model = model or settings.ENTERPRISE_AGENT_MODEL
     return ChatOpenAI(
         api_key=settings.OPENAI_API_KEY,
         model=chosen_model,

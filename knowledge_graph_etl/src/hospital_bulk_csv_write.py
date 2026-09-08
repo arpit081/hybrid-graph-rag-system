@@ -4,7 +4,7 @@ from retry import retry
 from neo4j import GraphDatabase
 
 # Paths to CSV files containing hospital data
-HOSPITALS_CSV_PATH = os.getenv("HOSPITALS_CSV_PATH")
+ENTITIES_CSV_PATH = os.getenv("ENTITIES_CSV_PATH")
 PAYERS_CSV_PATH = os.getenv("PAYERS_CSV_PATH")
 PHYSICIANS_CSV_PATH = os.getenv("PHYSICIANS_CSV_PATH")
 PATIENTS_CSV_PATH = os.getenv("PATIENTS_CSV_PATH")
@@ -52,7 +52,7 @@ def load_hospital_graph_from_csv() -> None:
     with driver.session(database="neo4j") as session:
         query = f"""
         LOAD CSV WITH HEADERS
-        FROM '{HOSPITALS_CSV_PATH}' AS hospitals
+        FROM '{ENTITIES_CSV_PATH}' AS hospitals
         MERGE (h:Hospital {{id: toInteger(hospitals.hospital_id),
                             name: hospitals.hospital_name,
                             state_name: hospitals.hospital_state}});

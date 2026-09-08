@@ -9,7 +9,7 @@ import sys
 import time
 from typing import Any, Dict, List
 
-# Ensure chatbot_api and src are in python search path
+# Ensure core_api and src are in python search path
 CURRENT_DIR = Path(__file__).resolve().parent
 CHATBOT_API_DIR = CURRENT_DIR.parent
 if str(CHATBOT_API_DIR) not in sys.path:
@@ -48,11 +48,11 @@ def run_evaluation(
     dataset: List[Dict[str, Any]],
     mock_run: bool = False,
 ) -> Dict[str, Any]:
-    """Runs evaluation over the dataset using hospital_cypher_chain."""
+    """Runs evaluation over the dataset using enterprise_cypher_chain."""
     chain = None
     if not mock_run:
-        from src.chains.hospital_cypher_chain import hospital_cypher_chain
-        chain = hospital_cypher_chain
+        from src.chains.enterprise_cypher_chain import enterprise_cypher_chain
+        chain = enterprise_cypher_chain
         chain.return_intermediate_steps = True
 
     results: List[Dict[str, Any]] = []

@@ -31,9 +31,9 @@ class Settings(BaseSettings):
     REDIS_CYPHER_CACHE_TTL: int = 86400  # 24 hours
 
     # Model parameters with defaults
-    HOSPITAL_AGENT_MODEL: str = "gpt-4o-mini"
-    HOSPITAL_CYPHER_MODEL: str = "gpt-4o-mini"
-    HOSPITAL_QA_MODEL: str = "gpt-4o-mini"
+    ENTERPRISE_AGENT_MODEL: str = "gpt-4o-mini"
+    ENTERPRISE_CYPHER_MODEL: str = "gpt-4o-mini"
+    ENTERPRISE_QA_MODEL: str = "gpt-4o-mini"
 
     # Cypher few-shot example index settings
     NEO4J_CYPHER_EXAMPLES_INDEX_NAME: str = "questions"

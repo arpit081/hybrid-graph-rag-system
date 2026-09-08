@@ -1,5 +1,5 @@
 [project]
-name = "chatbot_api"
+name = "core_api"
 version = "0.1"
 dependencies = [
     "asyncio==3.4.3",

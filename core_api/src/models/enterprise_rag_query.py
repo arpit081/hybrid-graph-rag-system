@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 
 
-class HospitalQueryInput(BaseModel):
+class EnterpriseQueryInput(BaseModel):
     text: str
     stream: bool = False
 

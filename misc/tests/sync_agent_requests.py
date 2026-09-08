@@ -1,7 +1,7 @@
 import time
 import requests
 
-CHATBOT_URL = "http://localhost:8000/hospital-rag-agent"
+CHATBOT_URL = "http://localhost:8000/graph-rag-agent"
 
 questions = [
     "What is the current wait time at wallace-hamilton hospital?",

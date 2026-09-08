@@ -3,7 +3,7 @@ import sys
 import unittest
 from unittest.mock import MagicMock
 
-# Ensure chatbot_api is on sys.path for direct invocations
+# Ensure core_api is on sys.path for direct invocations
 CHATBOT_API_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 if CHATBOT_API_DIR not in sys.path:
     sys.path.insert(0, CHATBOT_API_DIR)

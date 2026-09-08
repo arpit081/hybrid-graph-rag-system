@@ -4,7 +4,7 @@ import sys
 import unittest
 from unittest.mock import AsyncMock, MagicMock, patch
 
-# Ensure chatbot_api is on sys.path for direct invocations
+# Ensure core_api is on sys.path for direct invocations
 CHATBOT_API_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 if CHATBOT_API_DIR not in sys.path:
     sys.path.insert(0, CHATBOT_API_DIR)
@@ -61,7 +61,7 @@ sys.meta_path.insert(0, MockFinder)
 
 from fastapi.testclient import TestClient
 from src.main import app
-from src.models.hospital_rag_query import HospitalQueryInput
+from src.models.enterprise_rag_query import EnterpriseQueryInput
 from src.utils.redis_cache import (
     get_cache_key,
     get_cached_cypher,
@@ -136,15 +136,15 @@ class TestRedisCacheAndStreaming(unittest.TestCase):
 
     def test_cypher_gen_checks_cache_before_llm(self):
         """Agent's cypher_gen node must return cached Cypher without invoking LLM."""
-        from src.agents.hospital_rag_agent import cypher_gen
-        from src.chains.hospital_cypher_chain import hospital_cypher_chain
+        from src.agents.graph_rag_agent import cypher_gen
+        from src.chains.enterprise_cypher_chain import enterprise_cypher_chain
 
         question = "Which hospitals are in the hospital system?"
         cached_cypher = "MATCH (h:Hospital) RETURN h.name LIMIT 200"
         set_cached_cypher(question, cached_cypher)
 
         mock_chain = MagicMock()
-        hospital_cypher_chain.cypher_generation_chain = mock_chain
+        enterprise_cypher_chain.cypher_generation_chain = mock_chain
 
         state = {
             "input": question,
@@ -167,7 +167,7 @@ class TestRedisCacheAndStreaming(unittest.TestCase):
         self.assertIsNone(res["cypher_error"])
 
     def test_non_streaming_fallback_path(self):
-        """POST /hospital-rag-agent with stream=False must return standard JSON response."""
+        """POST /graph-rag-agent with stream=False must return standard JSON response."""
         client = TestClient(app)
         mock_response = {
             "input": "How many hospitals are there?",
@@ -177,7 +177,7 @@ class TestRedisCacheAndStreaming(unittest.TestCase):
 
         with patch("src.main.invoke_agent_with_retry", new=AsyncMock(return_value=mock_response)):
             response = client.post(
-                "/hospital-rag-agent",
+                "/graph-rag-agent",
                 json={"text": "How many hospitals are there?", "stream": False},
             )
 
@@ -189,7 +189,7 @@ class TestRedisCacheAndStreaming(unittest.TestCase):
             self.assertIn("Tool: explore_hospital_database", data["intermediate_steps"])
 
     def test_streaming_endpoint_sse(self):
-        """POST /hospital-rag-agent with stream=True must return SSE stream with tokens."""
+        """POST /graph-rag-agent with stream=True must return SSE stream with tokens."""
         client = TestClient(app)
 
         async def mock_event_generator(query: str):
@@ -203,9 +203,9 @@ class TestRedisCacheAndStreaming(unittest.TestCase):
                 "intermediate_steps": ["Tool: explore_hospital_database"],
             }
 
-        with patch("src.main.astream_hospital_rag_agent", side_effect=mock_event_generator):
+        with patch("src.main.astream_graph_rag_agent", side_effect=mock_event_generator):
             response = client.post(
-                "/hospital-rag-agent",
+                "/graph-rag-agent",
                 json={"text": "List hospitals", "stream": True},
             )
 

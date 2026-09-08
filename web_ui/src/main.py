@@ -3,7 +3,7 @@ import os
 import requests
 import streamlit as st
 
-CHATBOT_URL = os.getenv("CHATBOT_URL", "http://localhost:8000/hospital-rag-agent")
+CHATBOT_URL = os.getenv("CHATBOT_URL", "http://localhost:8000/graph-rag-agent")
 
 with st.sidebar:
     st.header("About")

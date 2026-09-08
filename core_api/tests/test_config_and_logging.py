@@ -24,9 +24,9 @@ class TestConfigAndLogging(unittest.TestCase):
             "NEO4J_USERNAME",
             "NEO4J_PASSWORD",
             "OPENAI_API_KEY",
-            "HOSPITAL_AGENT_MODEL",
-            "HOSPITAL_CYPHER_MODEL",
-            "HOSPITAL_QA_MODEL",
+            "ENTERPRISE_AGENT_MODEL",
+            "ENTERPRISE_CYPHER_MODEL",
+            "ENTERPRISE_QA_MODEL",
         ]
         for key in keys:
             if key in os.environ:
@@ -65,7 +65,7 @@ class TestConfigAndLogging(unittest.TestCase):
             self.assertEqual(s.NEO4J_USERNAME, "neo4j")
             self.assertEqual(s.NEO4J_PASSWORD, "secret")
             self.assertEqual(s.OPENAI_API_KEY, "sk-test123")
-            self.assertEqual(s.HOSPITAL_AGENT_MODEL, "gpt-4o-mini")
+            self.assertEqual(s.ENTERPRISE_AGENT_MODEL, "gpt-4o-mini")
             self.assertEqual(s.NEO4J_CYPHER_EXAMPLES_INDEX_NAME, "questions")
         finally:
             for key in test_env:

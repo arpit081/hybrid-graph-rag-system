@@ -51,7 +51,7 @@ review_prompt = ChatPromptTemplate(
 )
 
 reviews_vector_chain = RetrievalQA.from_chain_type(
-    llm=get_llm(model=settings.HOSPITAL_QA_MODEL, temperature=0),
+    llm=get_llm(model=settings.ENTERPRISE_QA_MODEL, temperature=0),
     chain_type="stuff",
     retriever=neo4j_vector_index.as_retriever(k=12),
 )

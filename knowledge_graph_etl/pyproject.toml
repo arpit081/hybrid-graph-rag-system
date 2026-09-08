@@ -1,5 +1,5 @@
 [project]
-name = "hospital_neo4j_etl"
+name = "knowledge_graph_etl"
 version = "0.1"
 dependencies = [
    "neo4j==5.14.1",

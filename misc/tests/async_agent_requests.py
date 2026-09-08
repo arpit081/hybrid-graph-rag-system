@@ -2,7 +2,7 @@ import asyncio
 import time
 import httpx
 
-CHATBOT_URL = "http://localhost:8000/hospital-rag-agent"
+CHATBOT_URL = "http://localhost:8000/graph-rag-agent"
 
 
 async def make_async_post(url, data):

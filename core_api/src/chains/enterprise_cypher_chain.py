@@ -141,9 +141,9 @@ qa_generation_prompt = PromptTemplate(
 # NOTE: Cypher generation quality may differ between OpenAI and Ollama.
 # Smaller open-weights models may hallucinate relationships or struggle with multi-hop
 # queries; the validator node in the LangGraph workflow catches and retries syntax errors.
-hospital_cypher_chain = GraphCypherQAChain.from_llm(
-    cypher_llm=get_llm(model=settings.HOSPITAL_CYPHER_MODEL, temperature=0),
-    qa_llm=get_llm(model=settings.HOSPITAL_QA_MODEL, temperature=0),
+enterprise_cypher_chain = GraphCypherQAChain.from_llm(
+    cypher_llm=get_llm(model=settings.ENTERPRISE_CYPHER_MODEL, temperature=0),
+    qa_llm=get_llm(model=settings.ENTERPRISE_QA_MODEL, temperature=0),
     cypher_example_retriever=cypher_example_retriever,
     node_properties_to_exclude=["embedding"],
     graph=graph,

@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "langchain-neo4j-rag-app"
+name = "hybrid-graph-rag-system"
 version = "0.1.0"
 description = "An increasingly comprehensive RAG app with LangChain, Neo4j, and more"
 authors = ["Arpit"]

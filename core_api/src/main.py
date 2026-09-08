@@ -5,15 +5,15 @@ from typing import Union
 from fastapi import FastAPI, Request
 from fastapi.responses import StreamingResponse
 from src.utils.logging_config import configure_logging
-from src.agents.hospital_rag_agent import (
-    astream_hospital_rag_agent,
-    hospital_rag_agent_executor,
+from src.agents.graph_rag_agent import (
+    astream_graph_rag_agent,
+    graph_rag_agent_executor,
 )
-from src.models.hospital_rag_query import HospitalQueryInput, HospitalQueryOutput
+from src.models.enterprise_rag_query import EnterpriseQueryInput, HospitalQueryOutput
 from src.utils.async_utils import async_retry
 
 configure_logging()
-logger = logging.getLogger("chatbot_api")
+logger = logging.getLogger("core_api")
 
 app = FastAPI(
     title="Hospital Chatbot",
@@ -28,7 +28,7 @@ async def invoke_agent_with_retry(query: str):
     are intermittent connection issues to external APIs.
     """
 
-    return await hospital_rag_agent_executor.ainvoke({"input": query})
+    return await graph_rag_agent_executor.ainvoke({"input": query})
 
 
 @app.get("/")
@@ -36,9 +36,9 @@ async def get_status():
     return {"status": "running"}
 
 
-@app.post("/hospital-rag-agent", response_model=Union[HospitalQueryOutput, None])
+@app.post("/graph-rag-agent", response_model=Union[HospitalQueryOutput, None])
 async def ask_hospital_agent(
-    query: HospitalQueryInput,
+    query: EnterpriseQueryInput,
     request: Request,
 ):
     accept_header = request.headers.get("accept", "")
@@ -57,7 +57,7 @@ async def ask_hospital_agent(
         async def sse_event_generator():
             start_time = time.perf_counter()
             try:
-                async for event in astream_hospital_rag_agent(query.text):
+                async for event in astream_graph_rag_agent(query.text):
                     yield f"data: {json.dumps(event)}\n\n"
                 duration_ms = round((time.perf_counter() - start_time) * 1000, 2)
                 logger.info(
@@ -100,7 +100,7 @@ async def ask_hospital_agent(
             },
         )
 
-    # Non-streaming fallback path (used by cypher_example_portal and existing sync tests)
+    # Non-streaming fallback path (used by admin_query_portal and existing sync tests)
     start_time = time.perf_counter()
     logger.info(
         "Request received",

@@ -33,7 +33,7 @@ from langgraph.graph import END, StateGraph
 from pydantic import BaseModel, Field
 
 from src.config import settings
-from src.chains.hospital_cypher_chain import hospital_cypher_chain
+from src.chains.enterprise_cypher_chain import enterprise_cypher_chain
 from src.chains.hospital_review_chain import review_prompt, reviews_vector_chain
 from src.llm import get_llm
 from src.langchain_custom.graph_qa.cypher import extract_cypher, remove_keys_from_dicts
@@ -50,7 +50,7 @@ from src.utils.redis_cache import get_cached_cypher, set_cached_cypher
 logger = logging.getLogger(__name__)
 
 agent_chat_model = get_llm(
-    model=settings.HOSPITAL_AGENT_MODEL,
+    model=settings.ENTERPRISE_AGENT_MODEL,
     temperature=0,
 )
 
@@ -179,7 +179,7 @@ def route_decision(state: AgentState) -> str:
 
 
 def cypher_gen(state: AgentState) -> Dict[str, Any]:
-    """Generates a Cypher query using hospital_cypher_chain's generation chain."""
+    """Generates a Cypher query using enterprise_cypher_chain's generation chain."""
     question = state["input"]
     error_context = state.get("cypher_error")
     start_time = time.perf_counter()
@@ -213,9 +213,9 @@ def cypher_gen(state: AgentState) -> Dict[str, Any]:
         prompt_question = question
 
     try:
-        raw_cypher = hospital_cypher_chain.cypher_generation_chain.invoke(
+        raw_cypher = enterprise_cypher_chain.cypher_generation_chain.invoke(
             {
-                "schema": hospital_cypher_chain.graph_schema,
+                "schema": enterprise_cypher_chain.graph_schema,
                 "question": prompt_question,
             }
         )
@@ -254,7 +254,7 @@ def cypher_gen(state: AgentState) -> Dict[str, Any]:
 def validator(state: AgentState) -> Dict[str, Any]:
     """Runs CypherQueryCorrector and validates/executes query, retrying once on failure."""
     cypher_query = state.get("cypher_query", "")
-    corrector = hospital_cypher_chain.cypher_query_corrector
+    corrector = enterprise_cypher_chain.cypher_query_corrector
     retry_count = state.get("cypher_retry_count", 0)
 
     try:
@@ -263,7 +263,7 @@ def validator(state: AgentState) -> Dict[str, Any]:
 
         # 1. Apply query guard: reject mutation keywords and ensure LIMIT
         guarded_query = apply_query_guard(
-            cypher_query, default_limit=hospital_cypher_chain.top_k or 200
+            cypher_query, default_limit=enterprise_cypher_chain.top_k or 200
         )
 
         # 2. Validate relationship direction against schema (ExtendedCypherQueryCorrector rejects reversed paths)
@@ -274,12 +274,12 @@ def validator(state: AgentState) -> Dict[str, Any]:
         # 3. Execute query strictly in read-only session mode
         start_exec = time.perf_counter()
         context = execute_read_only_cypher(
-            hospital_cypher_chain.graph, corrected_query
-        )[: hospital_cypher_chain.top_k]
+            enterprise_cypher_chain.graph, corrected_query
+        )[: enterprise_cypher_chain.top_k]
 
-        if hospital_cypher_chain.node_properties_to_exclude and isinstance(context, list):
+        if enterprise_cypher_chain.node_properties_to_exclude and isinstance(context, list):
             context = remove_keys_from_dicts(
-                context, hospital_cypher_chain.node_properties_to_exclude
+                context, enterprise_cypher_chain.node_properties_to_exclude
             )
 
         # 4. Cache validated & executed Cypher query in Redis
@@ -401,10 +401,10 @@ def respond(state: AgentState) -> Dict[str, Any]:
                 "Please verify your question details or try rephrasing."
             )
         else:
-            qa_res = hospital_cypher_chain.qa_chain.invoke(
+            qa_res = enterprise_cypher_chain.qa_chain.invoke(
                 {"question": question, "context": context if context is not None else []}
             )
-            output = qa_res.get(hospital_cypher_chain.qa_chain.output_key, str(qa_res))
+            output = qa_res.get(enterprise_cypher_chain.qa_chain.output_key, str(qa_res))
 
         step = (
             AgentActionStep(
@@ -427,7 +427,7 @@ def respond(state: AgentState) -> Dict[str, Any]:
 
 
 # Standalone callable functions preserving existing tool behaviors
-explore_hospital_database = hospital_cypher_chain.invoke
+explore_hospital_database = enterprise_cypher_chain.invoke
 explore_patient_experiences = reviews_vector_chain.invoke
 get_hospital_wait_time = get_current_wait_times
 find_most_available_hospital = get_most_available_hospital
@@ -486,10 +486,10 @@ def build_hospital_rag_graph() -> StateGraph:
 
 
 hospital_rag_graph = build_hospital_rag_graph()
-hospital_rag_agent_executor = hospital_rag_graph.compile()
+graph_rag_agent_executor = hospital_rag_graph.compile()
 
 
-async def astream_hospital_rag_agent(
+async def astream_graph_rag_agent(
     question: str,
 ) -> AsyncGenerator[Dict[str, Any], None]:
     """Streams the hospital RAG agent execution and final answer tokens via SSE events."""
@@ -539,10 +539,10 @@ async def astream_hospital_rag_agent(
             )
             yield {"type": "token", "token": final_output}
         else:
-            formatted_prompt = hospital_cypher_chain.qa_chain.prompt.format(
+            formatted_prompt = enterprise_cypher_chain.qa_chain.prompt.format(
                 question=question, context=context if context is not None else []
             )
-            async for chunk in hospital_cypher_chain.qa_chain.llm.astream(formatted_prompt):
+            async for chunk in enterprise_cypher_chain.qa_chain.llm.astream(formatted_prompt):
                 token = chunk.content if hasattr(chunk, "content") else str(chunk)
                 if token:
                     final_output += token

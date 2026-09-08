@@ -1,19 +1,19 @@
 version: '3'
 
 services:
-  hospital_neo4j_etl:
+  knowledge_graph_etl:
     build:
-      context: ./hospital_neo4j_etl
+      context: ./knowledge_graph_etl
     env_file:
       - .env
 
-  chatbot_api:
+  core_api:
     build:
-      context: ./chatbot_api
+      context: ./core_api
     env_file:
       - .env
     depends_on:
-      - hospital_neo4j_etl
+      - knowledge_graph_etl
       - redis
     ports:
       - "8000:8000"
@@ -25,23 +25,23 @@ services:
       - "6379:6379"
     restart: unless-stopped
 
-  chatbot_frontend:
+  web_ui:
     build:
-      context: ./chatbot_frontend
+      context: ./web_ui
     env_file:
       - .env
     depends_on:
-      - chatbot_api
+      - core_api
     ports:
       - "8501:8501"
 
-  cypher_example_portal:
+  admin_query_portal:
     build:
-      context: ./cypher_example_portal
+      context: ./admin_query_portal
     env_file:
       - .env
     depends_on:
-      - hospital_neo4j_etl
+      - knowledge_graph_etl
     ports:
       - "8502:8502"
 

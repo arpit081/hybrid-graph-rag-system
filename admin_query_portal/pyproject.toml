@@ -1,5 +1,5 @@
 [project]
-name = "chatbot_frontend"
+name = "web_ui"
 version = "0.1"
 dependencies = [
    "langchain-community==0.2.7",
