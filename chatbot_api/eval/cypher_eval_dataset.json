@@ -1,0 +1,182 @@
+[
+  {
+    "question": "What is the average billing amount across all visits?",
+    "category": "aggregation",
+    "expected_cypher": "MATCH (v:Visit)-[c:COVERED_BY]->(p:Payer) RETURN avg(c.billing_amount) AS average_billing_amount"
+  },
+  {
+    "question": "What is the total billing amount for Medicare covered visits?",
+    "category": "aggregation",
+    "expected_cypher": "MATCH (v:Visit)-[c:COVERED_BY]->(p:Payer) WHERE lower(p.name) = 'medicare' RETURN sum(c.billing_amount) AS total_billing_amount"
+  },
+  {
+    "question": "How many visits are there for each admission type?",
+    "category": "aggregation",
+    "expected_cypher": "MATCH (v:Visit) RETURN v.admission_type AS admission_type, count(v) AS visit_count"
+  },
+  {
+    "question": "What is the highest salary among all physicians?",
+    "category": "aggregation",
+    "expected_cypher": "MATCH (p:Physician) RETURN max(p.salary) AS max_salary"
+  },
+  {
+    "question": "How many hospitals are located in Texas?",
+    "category": "aggregation",
+    "expected_cypher": "MATCH (h:Hospital) WHERE lower(h.state_name) = 'tx' RETURN count(h) AS hospital_count"
+  },
+  {
+    "question": "What is the total number of registered patients?",
+    "category": "aggregation",
+    "expected_cypher": "MATCH (p:Patient) RETURN count(p) AS total_patients"
+  },
+  {
+    "question": "How many reviews have been written for each hospital?",
+    "category": "aggregation",
+    "expected_cypher": "MATCH (v:Visit)-[:AT]->(h:Hospital), (v)-[:WRITES]->(r:Review) RETURN h.name AS hospital_name, count(r) AS review_count"
+  },
+  {
+    "question": "What is the average physician salary by medical school?",
+    "category": "aggregation",
+    "expected_cypher": "MATCH (p:Physician) RETURN p.school AS school, avg(p.salary) AS average_salary"
+  },
+  {
+    "question": "What is the total amount billed to Cigna?",
+    "category": "aggregation",
+    "expected_cypher": "MATCH (v:Visit)-[c:COVERED_BY]->(p:Payer) WHERE lower(p.name) = 'cigna' RETURN sum(c.billing_amount) AS total_billed"
+  },
+  {
+    "question": "Which physicians have treated visits at Wallace-Hamilton?",
+    "category": "multi_hop",
+    "expected_cypher": "MATCH (h:Hospital)<-[:AT]-(v:Visit)<-[:TREATS]-(p:Physician) WHERE lower(h.name) = 'wallace-hamilton' RETURN DISTINCT p.name AS physician_name"
+  },
+  {
+    "question": "List the patients who had visits covered by Aetna.",
+    "category": "multi_hop",
+    "expected_cypher": "MATCH (p:Patient)-[:HAS]->(v:Visit)-[:COVERED_BY]->(pay:Payer) WHERE lower(pay.name) = 'aetna' RETURN DISTINCT p.name AS patient_name"
+  },
+  {
+    "question": "Which hospitals employ physicians that graduated from Harvard?",
+    "category": "multi_hop",
+    "expected_cypher": "MATCH (h:Hospital)-[:EMPLOYS]->(p:Physician) WHERE lower(p.school) CONTAINS 'harvard' RETURN DISTINCT h.name AS hospital_name"
+  },
+  {
+    "question": "Find all reviews written for visits treated by Dr. John Smith.",
+    "category": "multi_hop",
+    "expected_cypher": "MATCH (doc:Physician)-[:TREATS]->(v:Visit)-[:WRITES]->(r:Review) WHERE lower(doc.name) = 'john smith' RETURN r.text AS review_text"
+  },
+  {
+    "question": "Which insurance payers covered visits with abnormal test results?",
+    "category": "multi_hop",
+    "expected_cypher": "MATCH (v:Visit)-[:COVERED_BY]->(p:Payer) WHERE lower(v.test_results) = 'abnormal' RETURN DISTINCT p.name AS payer_name"
+  },
+  {
+    "question": "Find the names of patients who visited a hospital in North Carolina and wrote a review.",
+    "category": "multi_hop",
+    "expected_cypher": "MATCH (p:Patient)-[:HAS]->(v:Visit)-[:AT]->(h:Hospital), (v)-[:WRITES]->(r:Review) WHERE lower(h.state_name) = 'nc' RETURN DISTINCT p.name AS patient_name"
+  },
+  {
+    "question": "Which physicians treated patients that were admitted under emergency?",
+    "category": "multi_hop",
+    "expected_cypher": "MATCH (doc:Physician)-[:TREATS]->(v:Visit) WHERE lower(v.admission_type) = 'emergency' RETURN DISTINCT doc.name AS physician_name"
+  },
+  {
+    "question": "How much has Blue Cross billed for visits at Jordan Inc hospital?",
+    "category": "multi_hop",
+    "expected_cypher": "MATCH (h:Hospital)<-[:AT]-(v:Visit)-[c:COVERED_BY]->(p:Payer) WHERE lower(h.name) = 'jordan inc' AND lower(p.name) = 'blue cross' RETURN sum(c.billing_amount) AS total_billed"
+  },
+  {
+    "question": "What hospitals have treated patients with blood type O+?",
+    "category": "multi_hop",
+    "expected_cypher": "MATCH (p:Patient)-[:HAS]->(v:Visit)-[:AT]->(h:Hospital) WHERE p.blood_type = 'O+' RETURN DISTINCT h.name AS hospital_name"
+  },
+  {
+    "question": "List all visits that had abnormal test results.",
+    "category": "filter",
+    "expected_cypher": "MATCH (v:Visit) WHERE lower(v.test_results) = 'abnormal' RETURN v.id AS visit_id, v.admission_date AS admission_date"
+  },
+  {
+    "question": "Find all discharged visits in room number 101.",
+    "category": "filter",
+    "expected_cypher": "MATCH (v:Visit) WHERE v.room_number = 101 AND lower(v.status) = 'discharged' RETURN v.id AS visit_id"
+  },
+  {
+    "question": "Which physicians have a salary greater than 200000?",
+    "category": "filter",
+    "expected_cypher": "MATCH (p:Physician) WHERE p.salary > 200000 RETURN p.name AS physician_name, p.salary AS salary"
+  },
+  {
+    "question": "Find female patients born after 1990.",
+    "category": "filter",
+    "expected_cypher": "MATCH (p:Patient) WHERE lower(p.sex) = 'female' AND p.dob > '1990-01-01' RETURN p.name AS patient_name, p.dob AS dob"
+  },
+  {
+    "question": "List elective visits where the primary diagnosis is Hypertension.",
+    "category": "filter",
+    "expected_cypher": "MATCH (v:Visit) WHERE lower(v.admission_type) = 'elective' AND lower(v.diagnosis) = 'hypertension' RETURN v.id AS visit_id"
+  },
+  {
+    "question": "List hospitals located in Colorado.",
+    "category": "filter",
+    "expected_cypher": "MATCH (h:Hospital) WHERE lower(h.state_name) = 'co' RETURN h.name AS hospital_name"
+  },
+  {
+    "question": "Which physicians graduated before the year 2000?",
+    "category": "filter",
+    "expected_cypher": "MATCH (p:Physician) WHERE toInteger(p.grad_year) < 2000 RETURN p.name AS physician_name, p.grad_year AS grad_year"
+  },
+  {
+    "question": "Find all visits that were admitted in year 2023.",
+    "category": "filter",
+    "expected_cypher": "MATCH (v:Visit) WHERE v.admission_date >= '2023-01-01' AND v.admission_date < '2024-01-01' RETURN v.id AS visit_id, v.admission_date AS admission_date"
+  },
+  {
+    "question": "List all patients with blood type AB-.",
+    "category": "filter",
+    "expected_cypher": "MATCH (p:Patient) WHERE p.blood_type = 'AB-' RETURN p.name AS patient_name"
+  },
+  {
+    "question": "Find all open visits where the discharge date is missing.",
+    "category": "edge_case",
+    "expected_cypher": "MATCH (v:Visit) WHERE lower(v.status) = 'open' AND v.discharge_date IS NULL RETURN v.id AS open_visit_id"
+  },
+  {
+    "question": "What is the ratio of emergency visits to elective visits?",
+    "category": "edge_case",
+    "expected_cypher": "MATCH (v:Visit) WITH count(CASE WHEN lower(v.admission_type) = 'emergency' THEN 1 END) AS emergency_count, count(CASE WHEN lower(v.admission_type) = 'elective' THEN 1 END) AS elective_count WHERE elective_count > 0 RETURN toFloat(emergency_count) / elective_count AS emergency_to_elective_ratio"
+  },
+  {
+    "question": "Find patients who have a missing date of birth.",
+    "category": "edge_case",
+    "expected_cypher": "MATCH (p:Patient) WHERE p.dob IS NULL RETURN p.name AS patient_name"
+  },
+  {
+    "question": "Find visits covered by insurance where billing amount is null or zero.",
+    "category": "edge_case",
+    "expected_cypher": "MATCH (v:Visit)-[c:COVERED_BY]->(p:Payer) WHERE c.billing_amount IS NULL OR c.billing_amount = 0 RETURN v.id AS visit_id"
+  },
+  {
+    "question": "Return information for a non-existent hospital named Atlantis Medical.",
+    "category": "edge_case",
+    "expected_cypher": "MATCH (h:Hospital) WHERE lower(h.name) = 'atlantis medical' RETURN h.name AS hospital_name, h.state_name AS state"
+  },
+  {
+    "question": "What percentage of all visits had abnormal test results?",
+    "category": "edge_case",
+    "expected_cypher": "MATCH (v:Visit) WITH count(v) AS total_visits, count(CASE WHEN lower(v.test_results) = 'abnormal' THEN 1 END) AS abnormal_visits WHERE total_visits > 0 RETURN (toFloat(abnormal_visits) / total_visits) * 100.0 AS abnormal_percentage"
+  },
+  {
+    "question": "Find visits where the treatment description is not recorded.",
+    "category": "edge_case",
+    "expected_cypher": "MATCH (v:Visit) WHERE v.treatment_description IS NULL RETURN v.id AS visit_id"
+  },
+  {
+    "question": "Which physician has billed the highest amount without dividing by zero?",
+    "category": "edge_case",
+    "expected_cypher": "MATCH (phy:Physician)-[:TREATS]->(v:Visit)-[c:COVERED_BY]->(p:Payer) WHERE c.billing_amount IS NOT NULL RETURN phy.name AS physician_name, sum(c.billing_amount) AS total_billed ORDER BY total_billed DESC LIMIT 1"
+  },
+  {
+    "question": "Find all reviews with review text and physician name excluding the embedding property.",
+    "category": "edge_case",
+    "expected_cypher": "MATCH (r:Review) RETURN r.id AS review_id, r.text AS review_text, r.physician_name AS physician_name, r.patient_name AS patient_name, r.hospital_name AS hospital_name"
+  }
+]

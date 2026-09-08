@@ -1,0 +1,45 @@
+# Bytecode and runtime caches
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environments & secrets
+.env
+*.env
+.env.*
+!.env.example
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Packaging and build outputs
+build/
+dist/
+*.egg-info/
+*.egg
+
+# Testing & Coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Local Vector & Database Persistence
+chroma_data/
+ollama_data/
+redis_data/
+neo4j/data/
+
+# IDE & OS files
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Project-specific scratch folders
+notebooks/
+eda/
+todo.md
