@@ -14,10 +14,10 @@ try:
     )
 except ImportError:
     class Schema:  # type: ignore[no-redef]
-        def __init__(self, start: str, type: str, end: str) -> None:
-            self.start = start
-            self.type = type
-            self.end = end
+        def __init__(self, left_node: str, relation: str, right_node: str) -> None:
+            self.left_node = left_node
+            self.relation = relation
+            self.right_node = right_node
 
     class CypherQueryCorrector:  # type: ignore[no-redef]
         def __init__(self, schemas: Any) -> None:
@@ -95,7 +95,7 @@ class ExtendedCypherQueryCorrector(CypherQueryCorrector):
     def __init__(self, schemas: List[Schema]) -> None:
         super().__init__(schemas)
         self.schema_triplets: Set[Tuple[str, str, str]] = {
-            (s.start.upper(), s.type.upper(), s.end.upper()) for s in schemas
+            (s.left_node.upper(), s.relation.upper(), s.right_node.upper()) for s in schemas
         }
 
     def validate_relationship_direction(self, query: str) -> Tuple[bool, Optional[str]]:
